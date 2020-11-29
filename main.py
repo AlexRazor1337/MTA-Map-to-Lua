@@ -18,9 +18,9 @@ def generateCreateObjectString(object):
     rotZ = object.xpath('@rotZ')[0]
 
     if rotX == '0' and rotY == '0' and rotZ == '0':
-        final_string = "local object = createObject(%s, %s, %s, %s)" % (modelid, posX, posY, posZ)
+        final_string = "object = createObject(%s, %s, %s, %s)" % (modelid, posX, posY, posZ)
     else:
-        final_string = "local object = createObject(%s, %s, %s, %s, %s, %s, %s)" % (modelid, posX, posY, posZ, rotX, rotY, rotZ)
+        final_string = "object = createObject(%s, %s, %s, %s, %s, %s, %s)" % (modelid, posX, posY, posZ, rotX, rotY, rotZ)
 
     interior = object.xpath('@interior')[0]
     if interior != '0':
@@ -61,11 +61,14 @@ if __name__ == '__main__':
                         output_file_name = os.path.abspath(element).rsplit(os.sep, 1)[0] + os.sep + os.path.basename(element).rsplit('.', 1)[0] + '.lua'
                         output_file = open(output_file_name, 'w+')
 
+                        if root.xpath("count(object)") > 0:
+                            output_file.write("local object\n")
+                            
                         for obj in root.xpath("object"):
                             output_file.write(generateCreateObjectString(obj))
 
                         output_file.close()
-                        
+
                 except etree.XMLSyntaxError:
                     print("ERROR:", element, "is not a valid xml file!")
             else:
