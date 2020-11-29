@@ -57,17 +57,16 @@ if __name__ == '__main__':
                     with open(element) as file:
                         file_string = file.read().replace('edf:', '') # Parser doesn't like namespaces
                         root = etree.fromstring(file_string)
-
-                        output_file_name = os.path.abspath(element).rsplit(os.sep, 1)[0] + os.sep + os.path.basename(element).rsplit('.', 1)[0] + '.lua'
-                        output_file = open(output_file_name, 'w+')
-
                         if root.xpath("count(object)") > 0:
-                            output_file.write("local object\n")
-                            
-                        for obj in root.xpath("object"):
-                            output_file.write(generateCreateObjectString(obj))
+                            output_file_name = os.path.abspath(element).rsplit(os.sep, 1)[0] + os.sep + os.path.basename(element).rsplit('.', 1)[0] + '.lua'
+                            output_file = open(output_file_name, 'w+')
 
-                        output_file.close()
+                            output_file.write("local object\n")
+
+                            for obj in root.xpath("object"):
+                                output_file.write(generateCreateObjectString(obj))
+
+                            output_file.close()
 
                 except etree.XMLSyntaxError:
                     print("ERROR:", element, "is not a valid xml file!")
