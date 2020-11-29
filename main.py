@@ -46,18 +46,28 @@ def generateCreateObjectString(object):
     if scale != '1':
         final_string += "\nsetElementScale(object, %s)" % (scale)
 
-    return final_string
+    return final_string + '\n'
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         for element in sys.argv[1::]:
             if os.path.isfile(element):
-                with open(element) as file:
-                    file_string = file.read().replace('edf:', '') # Parser doesn't like namespaces
-                    root = etree.fromstring(file_string)
-                    for obj in root.xpath("object"):
-                        print(generateCreateObjectString(obj))
+                try:
+                    with open(element) as file:
+                        file_string = file.read().replace('edf:', '') # Parser doesn't like namespaces
+                        root = etree.fromstring(file_string)
+
+                        output_file_name = os.path.abspath(element).rsplit(os.sep, 1)[0] + os.sep + os.path.basename(element).rsplit('.', 1)[0] + '.lua'
+                        output_file = open(output_file_name, 'w+')
+
+                        for obj in root.xpath("object"):
+                            output_file.write(generateCreateObjectString(obj))
+
+                        output_file.close()
+                        
+                except etree.XMLSyntaxError:
+                    print("ERROR:", element, "is not a valid xml file!")
             else:
                 print("ERROR:", element, "is not a file!")
     else:
